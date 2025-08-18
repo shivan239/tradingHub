@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Trading Hub – Fundamental Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: #E0E0E0;
+            background-color: #121212; /* Fallback color */
+        }
+        .bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            opacity: 0.6; 
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Roboto', sans-serif;
+        }
+        /* Semi-transparent overlays */
+        .bg-dark { background-color: rgba(18, 18, 18, 0.6); }
+        .bg-dark-secondary { background-color: rgba(30, 30, 30, 0.6); }
+        .text-gold { color: #D4AF37; }
+        .border-gold { border-color: #D4AF37; }
+        .btn-gold {
+            background-color: #D4AF37;
+            color: #121212;
+            transition: all 0.3s ease;
+        }
+        .btn-gold:hover {
+            background-color: #EACD69;
+            transform: translateY(-2px);
+        }
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background-color: rgba(18, 18, 18, 0.6);
+            backdrop-filter: blur(10px);
+        }
+        .hero-section {
+            height: 85vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.2); 
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #D4AF37;
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        .card {
+            background-color: rgba(30, 30, 30, 0.6);
+            border: 1px solid #333;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.1);
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        .ticker-container {
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Modal styles */
+        .modal {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+             background-color: rgba(30, 30, 30, 0.95);
+        }
+
+        /* Hide scrollbar for horizontal scroll */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Background Video -->
+    <video autoplay muted loop playsinline class="bg-video">
+        <source src="https://cdn.pixabay.com/video/2022/07/02/122881-726547787_large.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Live Market Ticker -->
+    <div class="ticker-container">
+        <!-- TradingView Widget BEGIN -->
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+          {
+          "symbols": [
+            { "proName": "FOREXCOM:SPXUSD", "title": "S&P 500" },
+            { "proName": "FOREXCOM:NSXUSD", "title": "US 100" },
+            { "proName": "FX_IDC:EURUSD", "title": "EUR/USD" },
+            { "proName": "BITSTAMP:BTCUSD", "title": "Bitcoin" },
+            { "proName": "BITSTAMP:ETHUSD", "title": "Ethereum" },
+            { "description": "Apple", "proName": "NASDAQ:AAPL" },
+            { "description": "Microsoft", "proName": "NASDAQ:MSFT" },
+            { "description": "Google", "proName": "NASDAQ:GOOGL" },
+            { "description": "Amazon", "proName": "NASDAQ:AMZN" },
+            { "description": "NVIDIA", "proName": "NASDAQ:NVDA" },
+            { "description": "Tesla", "proName": "NASDAQ:TSLA" }
+          ],
+          "showSymbolLogo": true,
+          "colorTheme": "dark",
+          "isTransparent": true,
+          "displayMode": "adaptive",
+          "locale": "en"
+        }
+          </script>
+        </div>
+        <!-- TradingView Widget END -->
+    </div>
+
+    <!-- Header & Navigation -->
+    <header id="header" class="sticky-nav border-b border-gray-700">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-white nav-link" data-page="home">
+                Trading <span class="text-gold">Hub</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-8" id="desktop-nav-links">
+                <a href="#" class="nav-link text-gray-300 hover:text-gold active" data-page="home">Home</a>
+                <a href="#" class="nav-link text-gray-300 hover:text-gold" data-page="markets">Our Markets</a>
+                <a href="#" class="nav-link text-gray-300 hover:text-gold" data-page="blog">Fundamental Analysis Blog</a>
+                <a href="#" class="nav-link text-gray-300 hover:text-gold" data-page="contact">Contact</a>
+                <!-- Auth links will be injected here by JS -->
+            </div>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+            </div>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#" class="block py-2 text-gray-300 hover:text-gold" data-page="home">Home</a>
+            <a href="#" class="block py-2 text-gray-300 hover:text-gold" data-page="markets">Our Markets</a>
+            <a href="#" class="block py-2 text-gray-300 hover:text-gold" data-page="blog">Blog</a>
+            <a href="#" class="block py-2 text-gray-300 hover:text-gold" data-page="contact">Contact</a>
+             <!-- Mobile Auth links will be injected here by JS -->
+        </div>
+    </header>
+
+    <main>
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <!-- Hero Section -->
+            <section class="hero-section text-white text-center">
+                <div class="z-10 px-4">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight">Trade Currencies, Commodities, <br class="hidden md:block"> Precious Metals and Global Stock Indices</h1>
+                    <p class="text-lg md:text-xl max-w-3xl mx-auto text-gray-300">Unlock global markets with cutting-edge analysis and powerful insights. We provide the knowledge you need to navigate the financial world with confidence.</p>
+                </div>
+            </section>
+            
+            <!-- Value Proposition -->
+            <section class="py-16 sm:py-24 bg-dark">
+                <div class="container mx-auto px-6 text-center">
+                    <div class="grid md:grid-cols-3 gap-12">
+                        <div class="flex flex-col items-center">
+                            <div class="bg-dark-secondary p-5 rounded-full mb-4 border border-gray-700">
+                                <i class="fas fa-chart-line fa-2x text-gold"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-white">In-Depth Analysis</h3>
+                            <p class="text-gray-400">Access comprehensive fundamental analysis to make informed trading decisions.</p>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="bg-dark-secondary p-5 rounded-full mb-4 border border-gray-700">
+                                <i class="fas fa-book-open fa-2x text-gold"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-white">Educational Resources</h3>
+                            <p class="text-gray-400">Learn the intricacies of the markets with our extensive blog and guides.</p>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="bg-dark-secondary p-5 rounded-full mb-4 border border-gray-700">
+                                <i class="fas fa-globe fa-2x text-gold"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2 text-white">Global Market Coverage</h3>
+                            <p class="text-gray-400">Explore opportunities across Forex, commodities, indices, and more.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Latest Analysis Section -->
+            <section class="py-16 sm:py-24 bg-dark-secondary">
+                <div class="container mx-auto px-6">
+                    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">Latest Analysis</h2>
+                    <div class="overflow-x-auto hide-scrollbar pb-4">
+                        <div id="latest-posts-container" class="flex space-x-8">
+                            <!-- Latest blog posts will be loaded here dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Our Markets Page -->
+        <div id="markets" class="page">
+           <!-- Static content for markets page -->
+           <section class="py-16 sm:py-24 bg-dark">
+               <div class="container mx-auto px-6">
+                   <h1 class="text-4xl md:text-5xl font-bold text-center mb-12 text-white">Our Market Files</h1>
+                   <div id="market-files-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                       <!-- Files will be listed here dynamically -->
+                   </div>
+               </div>
+           </section>
+        </div>
+
+        <!-- Blog Page -->
+        <div id="blog" class="page">
+            <section class="py-16 sm:py-24 bg-dark">
+                <div class="container mx-auto px-6">
+                    <h1 class="text-4xl md:text-5xl font-bold text-center mb-12 text-white">Fundamental Analysis Blog</h1>
+                    <div id="blog-posts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Blog posts will be loaded here dynamically -->
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Contact Page -->
+        <div id="contact" class="page">
+            <!-- Static content for contact page -->
+        </div>
+
+        <!-- Admin Dashboard Page -->
+        <div id="admin" class="page">
+            <section class="py-16 sm:py-24 bg-dark-secondary">
+                <div class="container mx-auto px-6">
+                    <h1 class="text-4xl font-bold text-center mb-12">Admin Dashboard</h1>
+
+                    <!-- Create New Post (BLOG) -->
+                    <div class="max-w-2xl mx-auto bg-dark p-8 rounded-lg border border-gray-700 mb-12">
+                        <h2 class="text-2xl font-bold mb-6">Create New Post</h2>
+                        <form id="create-post-form">
+                            <div class="mb-4">
+                                <label for="post-title" class="block mb-2">Title</label>
+                                <input type="text" id="post-title" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="post-image-url" class="block mb-2">Image URL</label>
+                                <input type="url" id="post-image-url" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2" required>
+                            </div>
+                            <div class="mb-6">
+                                <label for="post-content" class="block mb-2">Content (Excerpt)</label>
+                                <textarea id="post-content" rows="5" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2" required></textarea>
+                            </div>
+                            <button type="submit" class="btn-gold font-bold w-full py-3 rounded-lg">Publish Post</button>
+                        </form>
+                    </div>
+
+                    <!-- NEW: Upload Excel File (MARKET FILES) -->
+                    <div class="max-w-2xl mx-auto bg-dark p-8 rounded-lg border border-gray-700 mb-12">
+                        <h2 class="text-2xl font-bold mb-6">Upload Market Excel File</h2>
+                        <form id="upload-excel-form">
+                            <div class="mb-4">
+                                <label for="market-file-title" class="block mb-2">Title (optional)</label>
+                                <input type="text" id="market-file-title" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2" placeholder="Title for the file (e.g., 'Daily FX Rates')">
+                            </div>
+                            <div class="mb-4">
+                                <label for="market-file-input" class="block mb-2">Choose Excel File (.xlsx, .xls, .csv)</label>
+                                <input type="file" id="market-file-input" accept=".xlsx,.xls,.csv" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2">
+                                <p id="market-file-name" class="text-sm text-gray-400 mt-2"></p>
+                            </div>
+                            <button type="submit" class="btn-gold font-bold w-full py-3 rounded-lg">Upload File</button>
+                        </form>
+                    </div>
+
+                    <div class="mt-16">
+                        <h2 class="text-2xl font-bold text-center mb-8">Manage Existing Posts</h2>
+                        <div id="manage-posts-container" class="space-y-4 max-w-4xl mx-auto">
+                            <!-- Existing posts will be listed here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+     <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 z-50 items-center justify-center hidden modal">
+        <div class="modal-content w-full max-w-md p-8 rounded-lg border border-gray-700 relative">
+            <button id="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">&times;</button>
+            <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="login-email" class="block mb-2">Email</label>
+                    <input type="email" id="login-email" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2" required>
+                </div>
+                <div class="mb-6">
+                    <label for="login-password" class="block mb-2">Password</label>
+                    <input type="password" id="login-password" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-2" required>
+                </div>
+                <button type="submit" class="btn-gold font-bold w-full py-3 rounded-lg">Login</button>
+                <p id="login-error" class="text-red-500 text-center mt-4"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- File Preview Modal (injected via JS but we'll create placeholder) -->
+    <div id="file-preview-modal" class="fixed inset-0 z-60 hidden items-center justify-center modal">
+        <div class="modal-content w-full max-w-4xl p-6 rounded-lg border border-gray-700 relative overflow-auto max-h-[85vh] bg-dark-secondary">
+            <button id="close-file-preview" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl">&times;</button>
+            <h2 id="file-preview-title" class="text-2xl font-bold mb-4 text-white"></h2>
+            <div id="file-preview-toolbar" class="flex items-center justify-between mb-4">
+                <div id="file-info" class="text-sm text-gray-400"></div>
+                <div>
+                    <a id="file-download-btn" class="inline-block font-bold py-2 px-4 rounded-lg border border-gray-600 text-center text-gray-200 hover:bg-gray-800" target="_blank">Download</a>
+                </div>
+            </div>
+            <div id="file-preview-content" class="bg-gray-900 p-4 rounded-md overflow-auto"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark-secondary border-t border-gray-700">
+       <!-- Static Footer Content -->
+    </footer>
+    
+    <!-- WhatsApp Chat Icon -->
+    <a href="https://wa.me/447458157780" target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-green-600 transition-all">
+        <i class="fab fa-whatsapp fa-2x"></i>
+    </a>
+
+    <!-- Firebase + App Script -->
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    // DOM references
+    const pages = document.querySelectorAll('.page');
+    const desktopNav = document.getElementById('desktop-nav-links');
+    const mobileNav = document.getElementById('mobile-menu');
+    const loginModal = document.getElementById('login-modal');
+    const loginForm = document.getElementById('login-form');
+    const closeModalButton = document.getElementById('close-modal');
+    const createPostForm = document.getElementById('create-post-form');
+    const blogPostsContainer = document.getElementById('blog-posts-container');
+    const managePostsContainer = document.getElementById('manage-posts-container');
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const latestPostsContainer = document.getElementById('latest-posts-container');
+    const marketFilesContainer = document.getElementById('market-files-container');
+
+    const uploadExcelForm = document.getElementById('upload-excel-form');
+    const marketFileInput = document.getElementById('market-file-input');
+    const marketFileNameEl = document.getElementById('market-file-name');
+    const marketFileTitleEl = document.getElementById('market-file-title');
+
+    const filePreviewModal = document.getElementById('file-preview-modal');
+    const closeFilePreviewBtn = document.getElementById('close-file-preview');
+    const filePreviewTitle = document.getElementById('file-preview-title');
+    const filePreviewInfo = document.getElementById('file-info');
+    const filePreviewContent = document.getElementById('file-preview-content');
+    const fileDownloadBtn = document.getElementById('file-download-btn');
+
+    // small helper to switch pages
+    function switchPage(pageId) {
+        pages.forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) targetPage.classList.add('active');
+
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll(`a[data-page="${pageId}"]`).forEach(l => l.classList.add('active'));
+
+        mobileNav.classList.add('hidden');
+        window.scrollTo(0,0);
+    }
+
+    // basic UI init
+    document.querySelectorAll('a[data-page]').forEach(link => {
+        link.addEventListener('click', e => { e.preventDefault(); switchPage(link.dataset.page); });
+    });
+    if (mobileMenuButton && mobileNav) {
+        mobileMenuButton.addEventListener('click', () => mobileNav.classList.toggle('hidden'));
+    }
+    if (closeModalButton) closeModalButton.addEventListener('click', () => loginModal.style.display = 'none');
+    if (closeFilePreviewBtn) closeFilePreviewBtn.addEventListener('click', () => {
+        filePreviewModal.classList.add('hidden');
+        filePreviewContent.innerHTML = '';
+    });
+
+    // Firebase config (same as yours)
+    const firebaseConfig = {
+        apiKey: "AIzaSyB9KoQVA6QVcYw0OkUMm1p9C7a2MPEWhSQ",
+        authDomain: "trading-hub-blog.firebaseapp.com",
+        projectId: "trading-hub-blog",
+        storageBucket: "trading-hub-blog.appspot.com",
+        messagingSenderId: "367973509856",
+        appId: "1:367973509856:web:302c1ab18ffc01b2b9fe85"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    let currentUser = null;
+    const ADMIN_EMAIL = "admin@tradinghub.com";
+
+    // update nav with login/logout/admin link
+    function updateNavUI(user) {
+        const isAdmin = user && user.email === ADMIN_EMAIL;
+        desktopNav.querySelectorAll('.auth-link').forEach(el => el.remove());
+        mobileNav.querySelectorAll('.auth-link').forEach(el => el.remove());
+        let desktopLinks = '', mobileLinks = '';
+        if (user) {
+            if (isAdmin) {
+                desktopLinks += `<a href="#" class="nav-link text-gray-300 hover:text-gold auth-link" data-page="admin">Admin</a>`;
+                mobileLinks += `<a href="#" class="block py-2 text-gray-300 hover:text-gold auth-link" data-page="admin">Admin</a>`;
+            }
+            desktopLinks += `<a href="#" id="logout-btn" class="nav-link text-gray-300 hover:text-gold auth-link">Logout</a>`;
+            mobileLinks += `<a href="#" id="mobile-logout-btn" class="block py-2 text-gray-300 hover:text-gold auth-link">Logout</a>`;
+        } else {
+            desktopLinks += `<a href="#" id="login-btn" class="nav-link text-gray-300 hover:text-gold auth-link">Login</a>`;
+            mobileLinks += `<a href="#" id="mobile-login-btn" class="block py-2 text-gray-300 hover:text-gold auth-link">Login</a>`;
+        }
+        desktopNav.insertAdjacentHTML('beforeend', desktopLinks);
+        mobileNav.insertAdjacentHTML('beforeend', mobileLinks);
+        attachAuthEventListeners();
+    }
+
+    function attachAuthEventListeners() {
+        document.getElementById('login-btn')?.addEventListener('click', (e) => { e.preventDefault(); loginModal.style.display = 'flex'; });
+        document.getElementById('mobile-login-btn')?.addEventListener('click', (e) => { e.preventDefault(); loginModal.style.display = 'flex'; });
+        document.getElementById('logout-btn')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+        document.getElementById('mobile-logout-btn')?.addEventListener('click', (e) => { e.preventDefault(); handleLogout(); });
+        document.querySelectorAll('a[data-page]').forEach(link => {
+            link.addEventListener('click', e => { e.preventDefault(); switchPage(link.dataset.page); });
+        });
+    }
+
+    onAuthStateChanged(auth, user => {
+        currentUser = user;
+        updateNavUI(user);
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const errorEl = document.getElementById('login-error');
+        errorEl.textContent = '';
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            loginModal.style.display = 'none';
+            loginForm.reset();
+        } catch (error) {
+            errorEl.textContent = "Invalid email or password.";
+            // if admin doesn't exist, try create (your previous logic)
+            if (error.code === 'auth/user-not-found' && email === ADMIN_EMAIL) {
+                try {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    await signInWithEmailAndPassword(auth, email, password);
+                    loginModal.style.display = 'none';
+                } catch (createError) {
+                    errorEl.textContent = "Could not create admin account.";
+                }
+            }
+        }
+    });
+
+    async function handleLogout() {
+        await signOut(auth);
+        switchPage('home');
+    }
+
+    // Collections & queries
+    const postsCollection = collection(db, "posts");
+    const postsQuery = query(postsCollection, orderBy("createdAt", "desc"));
+
+    const filesCollection = collection(db, "files");
+    const filesQuery = query(filesCollection, orderBy("createdAt", "desc"));
+
+    // --- Blog Create ---
+    createPostForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentUser || currentUser.email !== ADMIN_EMAIL) return alert("You are not authorized.");
+        const title = document.getElementById('post-title').value.trim();
+        const imageUrl = document.getElementById('post-image-url').value.trim();
+        const content = document.getElementById('post-content').value.trim();
+        try {
+            await addDoc(postsCollection, { title, imageUrl, content, createdAt: new Date() });
+            createPostForm.reset();
+        } catch (err) {
+            console.error("Error adding post:", err);
+            alert('Could not publish post.');
+        }
+    });
+
+    // --- Excel upload helper (Storage) ---
+    async function uploadFileToStorage(file) {
+        if (!file) return null;
+        const timestamp = Date.now();
+        const safeName = file.name.replace(/\s+/g, '_');
+        const path = `files/${timestamp}_${safeName}`;
+        try {
+            console.log("Creating storage ref:", path);
+            const sRef = storageRef(storage, path);
+            console.log("Uploading file to storage...");
+            await uploadBytes(sRef, file);
+            console.log("Uploaded. Getting download URL...");
+            const downloadUrl = await getDownloadURL(sRef);
+            console.log("Download URL:", downloadUrl);
+            return { downloadUrl, storagePath: path, fileName: file.name };
+        } catch (err) {
+            console.error("Storage upload failed:", err);
+            throw err;
+        }
+    }
+
+    // --- Excel Upload Form Handler ---
+    if (uploadExcelForm) {
+        uploadExcelForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log("Excel upload form submitted");
+            if (!currentUser || currentUser.email !== ADMIN_EMAIL) return alert("You are not authorized to upload files.");
+            const file = marketFileInput?.files?.[0] || null;
+            if (!file) return alert("Please choose a file before uploading.");
+            const titleVal = (marketFileTitleEl && marketFileTitleEl.value) ? marketFileTitleEl.value : '';
+            try {
+                const meta = await uploadFileToStorage(file);
+                // save metadata to Firestore
+                await addDoc(filesCollection, {
+                    title: titleVal || meta.fileName,
+                    fileName: meta.fileName,
+                    storagePath: meta.storagePath,
+                    downloadUrl: meta.downloadUrl,
+                    createdAt: new Date()
+                });
+                uploadExcelForm.reset();
+                if (marketFileNameEl) marketFileNameEl.textContent = '';
+                alert('File uploaded successfully.');
+            } catch (err) {
+                console.error('Upload error', err);
+                alert('Error uploading file. See console for details.');
+            }
+        });
+    }
+
+    // file input filename display
+    if (marketFileInput && marketFileNameEl) {
+        marketFileInput.addEventListener('change', () => {
+            if (marketFileInput.files && marketFileInput.files[0]) {
+                marketFileNameEl.textContent = `Selected: ${marketFileInput.files[0].name}`;
+            } else {
+                marketFileNameEl.textContent = '';
+            }
+        });
+    }
+
+    // --- Render posts (blog) ---
+    onSnapshot(postsQuery, (snapshot) => {
+        let blogHtml = '', manageHtml = '', latestHtml = '';
+        if (snapshot.empty) {
+            blogHtml = `<p class="text-center col-span-full">No blog posts yet.</p>`;
+            manageHtml = `<p class="text-center">No posts to manage.</p>`;
+            latestHtml = `<p class="text-center">No posts to show.</p>`;
+        } else {
+            snapshot.docs.forEach(docSnap => {
+                const post = docSnap.data();
+                const postId = docSnap.id;
+                blogHtml += `
+                    <div class="card rounded-lg overflow-hidden flex flex-col">
+                        <img src="${post.imageUrl}" alt="${post.title}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/1E1E1E/D4AF37?text=Image+Not+Found';">
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-xl font-bold text-white mb-2">${post.title}</h3>
+                            <p class="text-gray-400 mb-4 flex-grow">${post.content}</p>
+                            <a href="#" class="btn-gold font-bold py-2 px-4 rounded-lg text-center mt-auto">Read More</a>
+                        </div>
+                    </div>`;
+                latestHtml += `
+                    <a href="#" data-page="blog" class="block w-64 flex-shrink-0 card rounded-lg overflow-hidden">
+                        <img src="${post.imageUrl}" alt="${post.title}" class="w-full h-32 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/400x200/1E1E1E/D4AF37?text=Image+Not+Found';">
+                        <div class="p-4">
+                            <h4 class="text-md font-bold text-white truncate">${post.title}</h4>
+                        </div>
+                    </a>
+                `;
+                manageHtml += `
+                    <div class="bg-dark p-4 rounded-lg flex justify-between items-center border border-gray-700">
+                        <span class="truncate pr-4">${post.title}</span>
+                        <button data-id="${postId}" class="delete-post-btn text-red-500 hover:text-red-400 font-bold">Delete</button>
+                    </div>`;
+            });
+        }
+        document.getElementById('blog-posts-container').innerHTML = blogHtml;
+        document.getElementById('manage-posts-container').innerHTML = manageHtml;
+        document.getElementById('latest-posts-container').innerHTML = latestHtml;
+
+        document.querySelectorAll('.delete-post-btn').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                if (confirm("Are you sure?")) {
+                    await deleteDoc(doc(db, "posts", e.target.dataset.id));
+                }
+            });
+        });
+    });
+
+    // --- Render files (Our Markets) ---
+    onSnapshot(filesQuery, (snapshot) => {
+        let html = '';
+        if (snapshot.empty) {
+            html = `<p class="text-center col-span-full">No files uploaded yet.</p>`;
+        } else {
+            snapshot.docs.forEach(docSnap => {
+                const file = docSnap.data();
+                const fileId = docSnap.id;
+                html += `
+                    <div class="card rounded-lg overflow-hidden p-6 flex flex-col">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-white">${file.title || file.fileName}</h3>
+                                <p class="text-sm text-gray-400">${file.fileName}</p>
+                                <p class="text-xs text-gray-500 mt-1">${file.createdAt && file.createdAt.toDate ? file.createdAt.toDate().toLocaleString() : ''}</p>
+                            </div>
+                            <div class="flex flex-col items-end space-y-2">
+                                <button data-id="${fileId}" class="preview-file-btn btn-gold font-bold py-2 px-4 rounded-lg">Preview</button>
+                                <a href="${file.downloadUrl}" target="_blank" class="font-bold py-2 px-4 rounded-lg border border-gray-600 text-center text-gray-200 hover:bg-gray-800">Download</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        marketFilesContainer.innerHTML = html;
+
+        // attach preview handlers
+        document.querySelectorAll('.preview-file-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const id = e.currentTarget.dataset.id;
+                const docSnap = snapshot.docs.find(d => d.id === id);
+                if (!docSnap) return alert('File not found');
+                const fileData = docSnap.data();
+                openFilePreviewModal(fileData);
+            });
+        });
+    });
+
+    // --- SheetJS loader & preview modal ---
+    function loadSheetJSScript() {
+        return new Promise((resolve, reject) => {
+            if (window.XLSX) return resolve(window.XLSX);
+            const s = document.createElement('script');
+            s.src = 'https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js';
+            s.onload = () => resolve(window.XLSX);
+            s.onerror = () => reject(new Error('Failed to load SheetJS'));
+            document.head.appendChild(s);
+        });
+    }
+
+    async function openFilePreviewModal(fileData) {
+        try {
+            await loadSheetJSScript();
+        } catch (err) {
+            console.error('Could not load SheetJS', err);
+            alert('Preview unavailable (failed to load parser).');
+            return;
+        }
+        filePreviewTitle.textContent = fileData.title || fileData.fileName || 'Preview';
+        filePreviewInfo.textContent = fileData.fileName || '';
+        fileDownloadBtn.href = fileData.downloadUrl;
+
+        // fetch binary and parse
+        try {
+            const resp = await fetch(fileData.downloadUrl, { mode: 'cors' });
+            if (!resp.ok) throw new Error('Network response not ok');
+            const ab = await resp.arrayBuffer();
+            const workbook = XLSX.read(ab, { type: 'array' });
+            const firstSheet = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[firstSheet];
+            const html = XLSX.utils.sheet_to_html(sheet, { id: "sheet-preview", editable: false });
+            filePreviewContent.innerHTML = html;
+            filePreviewModal.classList.remove('hidden');
+        } catch (err) {
+            console.error('Error fetching/parsing file', err);
+            alert('Could not preview file. You can still download it.');
+        }
+    }
+
+    // initialize nav for signed out state
+    updateNavUI(null);
+    </script>
+</body>
+</html>
