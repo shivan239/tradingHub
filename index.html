@@ -56,6 +56,31 @@
             background-color: rgba(26, 33, 48, 0.7);
             backdrop-filter: blur(10px);
         }
+
+        /* Form input styling */
+        .bg-dark-secondary {
+             background-color: #000 !important;
+        }
+        input.bg-dark-secondary,
+        textarea.bg-dark-secondary,
+        input.bg-dark-secondary:focus,
+        textarea.bg-dark-secondary:focus {
+            color: var(--color-text-light);
+        }
+
+        /* Fix for browser autofill styles overriding background */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        textarea:-webkit-autofill,
+        textarea:-webkit-autofill:hover,
+        textarea:-webkit-autofill:focus {
+            -webkit-text-fill-color: var(--color-text-light) !important;
+            -webkit-box-shadow: 0 0 0px 1000px #000 inset !important; /* Black background for autofill */
+            transition: background-color 5000s ease-in-out 0s;
+            border: 1px solid var(--color-glass-border);
+        }
+
         .text-accent { color: var(--color-accent-green); }
         .text-delete { color: var(--color-accent-red); }
         .border-glass { border-color: var(--color-glass-border); }
@@ -505,15 +530,15 @@
                         <form id="create-post-form">
                             <!-- Form fields for blog post -->
                             <div class="mb-4">
-                                <label for="post-title" class="block mb-2">Title</label>
+                                <label for="post-title" class="block mb-2 text-accent">Title</label>
                                 <input type="text" id="post-title" class="w-full bg-dark-secondary border border-glass rounded-lg p-2" required>
                             </div>
                             <div class="mb-4">
-                                <label for="post-image-url" class="block mb-2">Image URL</label>
+                                <label for="post-image-url" class="block mb-2 text-accent">Image URL</label>
                                 <input type="url" id="post-image-url" class="w-full bg-dark-secondary border border-glass rounded-lg p-2" required>
                             </div>
                             <div class="mb-6">
-                                <label for="post-content" class="block mb-2">Content (Excerpt)</label>
+                                <label for="post-content" class="block mb-2 text-accent">Content (Excerpt)</label>
                                 <textarea id="post-content" rows="5" class="w-full bg-dark-secondary border border-glass rounded-lg p-2" required></textarea>
                             </div>
                             <button type="submit" class="btn-glass font-bold w-full py-3 rounded-xl">Publish Post</button>
@@ -529,11 +554,11 @@
                         <h2 class="text-2xl font-bold mb-6">Upload Market File</h2>
                         <form id="upload-file-form">
                             <div class="mb-4">
-                                <label for="file-title" class="block mb-2">File Title</label>
+                                <label for="file-title" class="block mb-2 text-accent">File Title</label>
                                 <input type="text" id="file-title" class="w-full bg-dark-secondary border border-glass rounded-lg p-2" required>
                             </div>
                             <div class="mb-6">
-                                <label for="file-upload" class="block mb-2">Select File (PDF, XLS, etc.)</label>
+                                <label for="file-upload" class="block mb-2 text-accent">Select File (PDF, XLS, etc.)</label>
                                 <input type="file" id="file-upload" class="w-full text-text-light" required>
                             </div>
                             <button type="submit" class="btn-glass font-bold w-full py-3 rounded-xl">Upload File</button>
@@ -1010,10 +1035,9 @@
                             // Render latest files on the homepage
                             const latestFiles = files.slice(0, 5);
                             latestFiles.forEach(file => {
-                                latestFilesHtml += `<a href="#" target="_blank" class="block w-64 flex-shrink-0 card card-light-hover rounded-2xl overflow-hidden">
-                                    <!-- Using a placeholder iframe for preview -->
-                                    <iframe src="${file.downloadURL}" class="w-full h-32 border-0 mb-4 rounded-xl"></iframe>
-                                    <div class="p-4"><h4 class="text-md font-bold text-text-light truncate">${file.title}</h4></div>
+                                latestFilesHtml += `<a href="${file.downloadURL}" target="_blank" class="block w-64 flex-shrink-0 card card-light-hover rounded-2xl overflow-hidden">
+                                    <div class="w-full h-32 bg-gray-800 flex items-center justify-center"><i class="fas fa-file-alt fa-3x text-text-muted"></i></div>
+                                    <div class="p-4"><h4 class="text-md font-bold text-accent truncate">${file.title}</h4></div>
                                 </a>`;
                             });
 
@@ -1021,8 +1045,8 @@
                             files.forEach(file => {
                                 marketFilesHtml += `
                                     <div class="card p-6 rounded-2xl flex flex-col text-center border-glass">
-                                        <h3 class="text-xl font-bold text-text-light mb-4">${file.title}</h3>
-                                        <iframe src="${file.downloadURL}" class="w-full h-64 border-0 mb-4 rounded-xl"></iframe>
+                                        <h3 class="text-xl font-bold text-accent mb-4">${file.title}</h3>
+                                        <div class="w-full h-64 bg-gray-800 flex items-center justify-center rounded-xl mb-4"><i class="fas fa-file-alt fa-5x text-text-muted"></i></div>
                                         <a href="${file.downloadURL}" target="_blank" class="btn-glass font-bold py-2 px-6 rounded-xl mt-auto">Download</a>
                                     </div>`;
                                 manageFilesHtml += `
