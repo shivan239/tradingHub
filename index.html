@@ -792,6 +792,10 @@
                     // Function to update the navigation UI based on user authentication state
                     function updateNavUI(user) {
                         const isAdmin = user && user.email === ADMIN_EMAIL;
+                        // Check for admin query parameter in URL
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const showLogin = urlParams.get('admin') === 'true';
+
                         // Remove old auth links
                         desktopNav.querySelectorAll('.auth-link').forEach(el => el.remove());
                         mobileNav.querySelectorAll('.auth-link').forEach(el => el.remove());
@@ -806,8 +810,8 @@
                             }
                             desktopLinks += `<a href="#" id="logout-btn" class="nav-link text-text-light hover:text-accent auth-link">Logout</a>`;
                             mobileLinks += `<a href="#" id="mobile-logout-btn" class="block py-2 text-text-light hover:text-accent auth-link">Logout</a>`;
-                        } else {
-                            // If no user is logged in
+                        } else if (showLogin) {
+                            // If no user is logged in AND admin=true is in the URL
                             desktopLinks += `<a href="#" id="login-btn" class="nav-link text-text-light hover:text-accent auth-link">Login</a>`;
                             mobileLinks += `<a href="#" id="mobile-login-btn" class="block py-2 text-text-light hover:text-accent auth-link">Login</a>`;
                         }
@@ -862,7 +866,8 @@
                     // Handle logout
                     async function handleLogout() {
                         await supabaseClient.auth.signOut();
-                        switchPage('home');
+                        // Redirect to the base URL without the admin parameter after logout
+                        window.location.href = window.location.pathname;
                     }
 
                     // --- Blog Logic ---
@@ -1074,4 +1079,3 @@
     </script>
 </body>
 </html>
-
